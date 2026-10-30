@@ -1,0 +1,52 @@
+<resources>
+    <string name="app_name">Interview Challenge</string>
+
+    <!-- General & Errors -->
+    <string name="button_cancel">انصراف</string>
+    <string name="error_action_not_supported">این عملیات توسط دستگاه شما پشتیبانی نمی‌شود</string>
+    <string name="app_uninstalled_successfully">برنامه حذف شد</string>
+
+    <!-- Home Screen -->
+    <string name="home_title_security_scanner">اسکنر برنامه‌ها</string>
+    <string name="home_subtitle_risk_analysis">تحلیل سطح ریسک برنامه‌ها</string>
+    <string name="landing_instruction_tap_to_start">برای شروع اسکن دکمه زیر را لمس کنید</string>
+    <string name="button_start_scan">شروع اسکن</string>
+    <string name="button_cancel_scan">لغو اسکن</string>
+    <string name="button_rescan">اسکن مجدد</string>
+    <string name="home_scan_results">نتایج اسکن</string>
+    <string name="summary_total">کل</string>
+    <string name="summary_high_risk">پرخطر</string>
+    <string name="summary_suspicious">مشکوک</string>
+    <string name="summary_safe">ایمن</string>
+    <string name="button_view_app_list">مشاهده لیست برنامه‌ها</string>
+    <string name="scan_progress_format">%1$s از %2$s</string>
+
+    <!-- App List Screen & Filters -->
+    <string name="topbar_title_app_list">لیست اپلیکیشن‌ها</string>
+    <string name="placeholder_search_apps">جستجو بر اساس نام اپلیکیشن...</string>
+    <string name="filter_all">همه</string>
+    <string name="filter_high">پرخطر</string>
+    <string name="filter_suspicious">مشکوک</string>
+    <string name="filter_safe">ایمن</string>
+
+    <!-- App Details Screen & Header -->
+    <string name="topbar_title_app_details">جزئیات برنامه</string>
+    <string name="button_app_info">اطلاعات برنامه</string>
+    <string name="button_uninstall_app">حذف نصب</string>
+    <string name="format_risk_level">سطح ریسک: %s</string>
+    <string name="requested_permissions_count">مجوزهای درخواستی (%s)</string>
+    <string name="no_permissions_requested">هیچ مجوزی درخواست نشده است.</string>
+    <string name="status_enabled">فعال</string>
+    <string name="status_disabled">غیرفعال</string>
+    <string name="permission_risk_sensitive">حساس</string>
+    <string name="permission_risk_normal">عادی</string>
+
+    <!-- Technical Details -->
+    <string name="details_label_package_name">نام پکیج</string>
+    <string name="details_label_app_version">نسخه</string>
+    <string name="details_label_install_date">نصب شده در</string>
+    <string name="details_label_app_size">اندازه</string>
+
+    <!-- App Top Bar -->
+    <string name="topbar_title_scan_apps">اسکن برنامه‌ها</string>
+</resources>

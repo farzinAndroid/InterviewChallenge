@@ -1,0 +1,18 @@
+# Room Database Entities and DAOs
+-keep class com.example.interviewchallenge.data.model.** { *; }
+-keep class * extends androidx.room.RoomDatabase
+-keep @androidx.room.Dao class * { *; }
+
+# Navigation & Kotlinx Serialization Routes
+-keepattributes *Annotation*, Signature, InnerClasses, EnclosingMethod
+-keepclassmembers class * {
+    @kotlinx.serialization.Serializable *;
+    @kotlinx.serialization.SerialName *;
+}
+-keep class com.example.interviewchallenge.ui.navigation.** { *; }
+
+# UI State Enums & Models
+-keep class com.example.interviewchallenge.ui.ui_utils.ScanPageState { *; }
+
+# Coroutines & Annotations
+-dontwarn javax.annotation.**
