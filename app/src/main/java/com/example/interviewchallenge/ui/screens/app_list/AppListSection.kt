@@ -47,6 +47,7 @@ fun AppListSection(
 ) {
     val searchQuery by databaseViewModel.searchQuery.collectAsStateWithLifecycle()
     val selectedFilter by databaseViewModel.selectedFilter.collectAsStateWithLifecycle()
+    val systemFilter by databaseViewModel.systemFilter.collectAsStateWithLifecycle()
     val currentApps by databaseViewModel.searchResultApps.collectAsStateWithLifecycle()
 
     Column(
@@ -74,6 +75,32 @@ fun AppListSection(
             singleLine = true,
             shape = RoundedCornerShape(MaterialTheme.spacing.dp12)
         )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState())
+                .padding(vertical = MaterialTheme.spacing.dp4)
+        ) {
+            val systemOptions = listOf(
+                null to "همه",
+                false to "برنامه‌های کاربر",
+                true to "برنامه‌های سیستمی"
+            )
+
+            systemOptions.forEach { option ->
+                FilterChip(
+                    selected = systemFilter == option.first,
+                    onClick = { databaseViewModel.onSystemFilterSelected(option.first) },
+                    label = { Text(option.second, fontWeight = FontWeight.Bold) },
+                    modifier = Modifier.padding(end = MaterialTheme.spacing.dp8),
+                    colors = FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = MaterialTheme.colorScheme.AccentPurpleColor,
+                        selectedLabelColor = Color.White
+                    )
+                )
+            }
+        }
 
         Row(
             modifier = Modifier

@@ -16,15 +16,19 @@ interface AppDao {
     @Query("DELETE FROM apps WHERE packageName = :pkg")
     suspend fun deleteByPackage(pkg: String)
 
+    @Query("DELETE FROM apps")
+    suspend fun deleteAll()
+
     @Query("SELECT * FROM apps WHERE packageName=:pkg LIMIT 1")
     fun getByPackage(pkg: String): Flow<AppInfo?>
 
     @Query("""
         SELECT * FROM apps 
-        WHERE :riskLevel = '' OR :riskLevel IS NULL OR riskLevel = :riskLevel
+        WHERE (:riskLevel = '' OR :riskLevel IS NULL OR riskLevel = :riskLevel)
+          AND (:isSystem IS NULL OR isSystem = :isSystem)
         ORDER BY appName ASC
     """)
-    fun getAppsByRiskLevel(riskLevel: String = ""): Flow<List<AppInfo>>
+    fun getAppsFiltered(riskLevel: String = "", isSystem: Boolean? = null): Flow<List<AppInfo>>
 
     @Query("""
         SELECT * FROM apps 

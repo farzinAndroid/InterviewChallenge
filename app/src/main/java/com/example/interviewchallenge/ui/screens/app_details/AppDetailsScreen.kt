@@ -158,7 +158,7 @@ private fun AppDetailsContent(
             } else {
                 items(
                     items = distinctPermissions,
-                    key = { perm -> if (perm.id != 0L) perm.id else perm.permissionName }
+                    key = { perm -> perm.permissionName }
                 ) { perm ->
                     PermissionItemCard(permission = perm)
                 }

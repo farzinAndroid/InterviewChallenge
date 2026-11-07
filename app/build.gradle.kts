@@ -49,7 +49,7 @@ dependencies {
     // Compose Bundle
     implementation(libs.bundles.composeBundle)
     implementation(platform(libs.androidx.compose.bom))
-    implementation("androidx.compose.material:material-icons-extended")
+    implementation(libs.androidx.compose.material.icons.extended)
 
     // Hilt DI
     implementation(libs.hilt.android)
@@ -65,9 +65,6 @@ dependencies {
     // Navigation & Serialization
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
-
-    // DataStore
-    implementation(libs.androidx.datastore.preferences)
 
     // Testing
     testImplementation(libs.junit)

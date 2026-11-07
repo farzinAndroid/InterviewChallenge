@@ -43,11 +43,15 @@ class ScannerViewModel @Inject constructor(
         scanJob?.cancel()
         scanJob = null
         scanState.value = ScanPageState.IDLE
+        viewModelScope.launch(Dispatchers.IO) {
+            scannerRepository.clearDatabase()
+        }
     }
 
     fun startScan() {
         if (scanJob?.isActive == true) return
         scanJob = viewModelScope.launch(Dispatchers.IO) {
+            scannerRepository.clearDatabase()
             scanState.emit(ScanPageState.SCANNING)
 
 

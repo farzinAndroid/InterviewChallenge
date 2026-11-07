@@ -10,6 +10,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -17,10 +19,16 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flattenConcat
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.text.isNotBlank
 import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
@@ -35,16 +43,28 @@ class AppDatabaseViewModel @Inject constructor(
     private val _selectedFilter = MutableStateFlow("")
     val selectedFilter = _selectedFilter.asStateFlow()
 
+    private val _systemFilter = MutableStateFlow<Boolean?>(null) // null = all, true = system, false = user
+    val systemFilter = _systemFilter.asStateFlow()
+
+    fun onSystemFilterSelected(isSystem: Boolean?) {
+        _systemFilter.value = isSystem
+    }
+
+    fun onFilterSelected(filter: String) {
+        _selectedFilter.value = filter
+    }
+
     val searchResultApps: StateFlow<List<AppInfo>> = combine(
         _searchQuery.debounce(200.milliseconds),
-        _selectedFilter
-    ) { query, filter ->
-        query to filter
-    }.flatMapLatest { (query, filter) ->
+        _selectedFilter,
+        _systemFilter
+    ) { query, riskFilter, sysFilter ->
+        Triple(query, riskFilter, sysFilter)
+    }.flatMapLatest { (query, riskFilter, sysFilter) ->
         if (query.isNotBlank()) {
             appDataBaseRepo.searchAppsByKeyword(query)
         } else {
-            appDataBaseRepo.getAppsByRiskLevel(filter)
+            appDataBaseRepo.getAppsFiltered(riskFilter, sysFilter)
         }
     }.stateIn(
         scope = viewModelScope,
@@ -73,9 +93,9 @@ class AppDatabaseViewModel @Inject constructor(
         _searchQuery.value = query
     }
 
-    fun onFilterSelected(filter: String) {
-        _selectedFilter.value = filter
-    }
+
+
+
 
     fun getAppByPackage(pkg: String) {
         viewModelScope.launch {

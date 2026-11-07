@@ -11,7 +11,8 @@ class AppDatabaseRepo @Inject constructor(
 
     fun getAppByPackage(pkg: String) = appDao.getByPackage(pkg)
 
-    fun getAppsByRiskLevel(riskLevel: String = "") = appDao.getAppsByRiskLevel(riskLevel)
+    fun getAppsByRiskLevel(riskLevel: String = "") = appDao.getAppsFiltered(riskLevel, null)
+    fun getAppsFiltered(riskLevel: String = "", isSystem: Boolean? = null) = appDao.getAppsFiltered(riskLevel, isSystem)
     fun searchAppsByKeyword(keyword: String) = appDao.searchAppsByKeyword(keyword)
 
     fun countSafeApps() = appDao.countSafeApps()
@@ -21,6 +22,11 @@ class AppDatabaseRepo @Inject constructor(
     suspend fun deleteAppByPackage(pkg: String) {
         appDao.deleteByPackage(pkg)
         permissionDao.deleteByPackage(pkg)
+    }
+
+    suspend fun clearDatabase() {
+        appDao.deleteAll()
+        permissionDao.deleteAll()
     }
 
     fun getPermissions(pkg: String) = permissionDao.getPermissions(pkg)

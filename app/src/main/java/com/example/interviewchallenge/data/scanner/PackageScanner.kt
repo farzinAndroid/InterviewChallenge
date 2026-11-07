@@ -27,15 +27,14 @@ class PackageScanner @Inject constructor(
     suspend fun startScan(
         onProgress: (scanned: Int, total: Int, suspicious: Int, remaining: Int, appName: String, icon: Bitmap) -> Unit
     ) {
+        val flagsToQuery = (PackageManager.GET_PERMISSIONS or PackageManager.GET_SERVICES).toLong()
         val packages = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             pm.getInstalledPackages(
-                PackageManager.PackageInfoFlags.of(
-                    PackageManager.GET_PERMISSIONS.toLong()
-                )
+                PackageManager.PackageInfoFlags.of(flagsToQuery)
             )
         } else {
             @Suppress("DEPRECATION")
-            pm.getInstalledPackages(PackageManager.GET_PERMISSIONS)
+            pm.getInstalledPackages(PackageManager.GET_PERMISSIONS or PackageManager.GET_SERVICES)
         }
 
         val total = packages.size
@@ -77,12 +76,24 @@ class PackageScanner @Inject constructor(
                 suspicious = isSuspicious
             )
 
+            val installer = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                pm.getInstallSourceInfo(packageName).installingPackageName
+            }else{
+                pm.getInstallerPackageName(packageName)
+            }
+
+            val issideloaded = installer == null || installer == "com.android.vending"
+
+
             appDao.insert(appInfo)
+
+            val permissionList = mutableListOf<PermissionInfo>()
 
             pkg.requestedPermissions?.let { perms ->
                 val flags = pkg.requestedPermissionsFlags
-                val list = perms.mapIndexed { i, p ->
+                val mapped = perms.mapIndexed { i, p ->
                     val granted = flags != null && i < flags.size && (flags[i] and PackageInfo.REQUESTED_PERMISSION_GRANTED) != 0
+
                     val isDangerous = try {
                         val pInfo = pm.getPermissionInfo(p, 0)
                         (pInfo.protectionLevel and android.content.pm.PermissionInfo.PROTECTION_DANGEROUS) != 0 ||
@@ -98,9 +109,28 @@ class PackageScanner @Inject constructor(
                         dangerous = isDangerous,
                         granted = granted
                     )
-                }.distinctBy { it.permissionName }
-                permissionDao.insertAll(list)
+                }
+                permissionList.addAll(mapped)
             }
+
+            // Inspect <service> tags for BIND_ACCESSIBILITY_SERVICE
+            val hasAccessibilityService = pkg.services?.any { service ->
+                service.permission == Manifest.permission.BIND_ACCESSIBILITY_SERVICE
+            } ?: false
+
+            if (hasAccessibilityService && permissionList.none { it.permissionName == Manifest.permission.BIND_ACCESSIBILITY_SERVICE }) {
+                permissionList.add(
+                    PermissionInfo(
+                        packageName = packageName,
+                        permissionName = Manifest.permission.BIND_ACCESSIBILITY_SERVICE,
+                        dangerous = true,
+                        granted = true
+                    )
+                )
+            }
+
+            val distinctList = permissionList.distinctBy { it.permissionName }
+            permissionDao.insertAll(distinctList)
 
             scanned++
             val remaining = total - scanned

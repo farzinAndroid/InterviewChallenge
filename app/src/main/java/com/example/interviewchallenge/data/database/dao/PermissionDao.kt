@@ -18,4 +18,7 @@ interface PermissionDao {
 
     @Query("DELETE FROM permissions WHERE packageName = :pkg")
     suspend fun deleteByPackage(pkg: String)
+
+    @Query("DELETE FROM permissions")
+    suspend fun deleteAll()
 }
